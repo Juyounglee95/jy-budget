@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 우리집 가계부: 아래 두 구글 계정만 읽고 쓸 수 있어요.
+    match /households/{householdId}/{document=**} {
+      allow read, write: if request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in [
+          'wife@gmail.com',     // 아내 구글 계정으로 바꾸세요
+          'husband@gmail.com'   // 남편 구글 계정으로 바꾸세요
+        ];
+    }
+    // 그 밖의 모든 경로는 막아 둡니다.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
